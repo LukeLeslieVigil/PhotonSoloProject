@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
-
 using Photon.Pun;
+using UnityEngine.XR;
 
 namespace Com.MyCompany.MyGame
 {
@@ -42,6 +42,21 @@ namespace Com.MyCompany.MyGame
         private GameObject beams;
         //True, when the user is firing
         bool IsFiring;
+        
+
+        enum Platform
+        {
+            desktop,
+            mobile,
+            web,
+            xr
+        }
+
+        InputDevice leftController;
+        InputDevice rightController;
+
+        Platform currentPlatform = Platform.desktop;
+
         #endregion
 
         #region Public Fields
@@ -80,6 +95,18 @@ namespace Com.MyCompany.MyGame
             // #Critical
             // we flag as don't destroy on load so that instance survives level synchronization, thus giving a seamless experience when levels load.
             DontDestroyOnLoad(this.gameObject);
+
+            //get vr controllers
+            if (UnityEngine.XR.XRSettings.isDeviceActive)
+            {
+                List<InputDevice> left = new List<InputDevice>();
+                List<InputDevice> right = new List<InputDevice>();
+                //InputDevices.GetDevices(devices);
+                InputDevices.GetDevicesWithCharacteristics(InputDeviceCharacteristics.Left | InputDeviceCharacteristics.Controller, left);
+                InputDevices.GetDevicesWithCharacteristics(InputDeviceCharacteristics.Right | InputDeviceCharacteristics.Controller, right);
+                leftController = left[0];
+                rightController = right[0];
+            }
         }
 
         /// <summary>
@@ -231,6 +258,7 @@ namespace Com.MyCompany.MyGame
                     IsFiring = false;
                 }
             }
+            
         }
 
         #if UNITY_5_4_OR_NEWER
